@@ -1,18 +1,18 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns="http://www.w3.org/1999/html">
 <head>
+    <meta charset="UTF-8">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Viva Admin">
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <style>
         body {
             padding-top: env(safe-area-inset-top);
             padding-bottom: env(safe-area-inset-bottom);
         }
     </style>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
     <title>Admin - Station Manager</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
@@ -72,7 +72,7 @@
                 </div>
                 <div class="col-span-2">
                     <label class="block text-[10px] text-slate-500 uppercase">Get Ready</label>
-                    <input id="st1-inp-ready" type="text" inputmode="numeric" placeholder="--"
+                    <input id="st1-inp-ready" type="text" inputmode="text" placeholder="--"
                            class="w-full bg-slate-900 border border-slate-600 rounded-lg p-2 text-center font-bold">
                 </div>
                 <div class="col-span-2">
@@ -111,7 +111,7 @@
                 </div>
                 <div class="col-span-2">
                     <label class="block text-[10px] text-slate-500 uppercase">Get Ready</label>
-                    <input id="st2-inp-ready" type="text" inputmode="numeric" placeholder="--"
+                    <input id="st2-inp-ready" type="text" inputmode="text" placeholder="--"
                            class="w-full bg-slate-900 border border-slate-600 rounded-lg p-2 text-center font-bold">
                 </div>
                 <div class="col-span-2">
@@ -150,7 +150,7 @@
                 </div>
                 <div class="col-span-2">
                     <label class="block text-[10px] text-slate-500 uppercase">Get Ready</label>
-                    <input id="st3-inp-ready" type="text" inputmode="numeric" placeholder="--"
+                    <input id="st3-inp-ready" type="text" inputmode="text" placeholder="--"
                            class="w-full bg-slate-900 border border-slate-600 rounded-lg p-2 text-center font-bold">
                 </div>
                 <div class="col-span-2">
@@ -163,6 +163,13 @@
                     class="w-full bg-emerald-600 active:bg-emerald-700 text-white font-bold py-3 rounded-xl shadow-lg shadow-emerald-500/20">
                 Push Station 03 Updates
             </button>
+        </section>
+        <section>
+            <div style="display: flex;justify-content: center;">
+            <button onclick="resetStation()"
+                class="px-6 bg-red-700 active:bg-slate-700 text-slate-300 font-bold py-3 rounded-xl transition-colors"> Reset All Stations
+            </button>
+            </div>
         </section>
         <p class="text-center text-slate-600 text-[10px] uppercase tracking-widest pt-4">End of Controls</p>
 
@@ -209,6 +216,29 @@
       ready: document.getElementById(`st${id}-inp-ready`).value,
       remarks: document.getElementById(`st${id}-inp-remarks`).value
     }).then(() => alert("Station " + id + " Updated!"));
+  }
+
+    // Function to clear all fields for a specific station
+  function resetStation() {
+    if (confirm(`Are you sure you want to reset Station `)) {
+      const resetData = {
+        ongoing: "--",
+        next: "--",
+        waiting: "--",
+        ready: "--",
+        remarks: "Station Reset"
+      };
+      [1, 2, 3].forEach(id => {
+      db.ref('stations/st' + id).set(resetData)
+        // Also clear the input fields in the Admin UI
+        document.getElementById(`st${id}-inp-ongoing`).value = "";
+        document.getElementById(`st${id}-inp-next`).value = "";
+        document.getElementById(`st${id}-inp-waiting`).value = "";
+        document.getElementById(`st${id}-inp-ready`).value = "";
+        document.getElementById(`st${id}-inp-remarks`).value = "";
+      });
+      alert(`All Stations  Cleared!`);
+    }
   }
 </script>
 </body>
