@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Viva Admin">
+
+    <style>
+        body {
+            padding-top: env(safe-area-inset-top);
+            padding-bottom: env(safe-area-inset-bottom);
+        }
+    </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Viva-Voce Display Station</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { background-color: #0f172a; } /* Slate 900 */
+    </style>
+</head>
+<body class="text-slate-100 min-h-screen flex flex-col font-sans">
+
+    <header class="p-6 bg-indigo-900 shadow-2xl border-b border-indigo-400/30">
+        <h1 id="announcement" class="text-4xl md:text-5xl font-black text-center tracking-tight uppercase">
+            Viva-Voce Session
+        </h1>
+        <p id="global-comments" class="text-lg md:text-xl text-indigo-200 text-center mt-2 italic">
+            Please keep your IDs ready and wait for your roll number.
+        </p>
+    </header>
+
+    <main class="flex-grow p-6 grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+        <section class="bg-slate-800/50 border border-slate-700 rounded-3xl p-6 flex flex-col justify-between shadow-xl">
+            <div class="flex justify-between items-start border-b border-slate-700 pb-4 mb-4">
+                <h2 class="text-4xl font-bold text-amber-400">Station 01</h2>
+                <span class="bg-green-500/20 text-green-400 px-3 py-1 rounded-full text-xs font-mono border border-green-500/30">LIVE</span>
+            </div>
+            <div class="space-y-6">
+                <div class="text-center">
+                    <p class="text-slate-400 uppercase tracking-widest text-sm">Ongoing</p>
+                    <p id="st1-ongoing" class="text-8xl font-black text-white">--</p>
+                </div>
+                <div class="grid grid-cols-3 gap-2 text-center">
+                    <div class="bg-slate-900/50 p-3 rounded-xl border border-slate-700">
+                        <p class="text-[10px] text-slate-500 uppercase">Next</p>
+                        <p id="st1-next" class="text-2xl font-bold text-indigo-300">--</p>
+                    </div>
+                    <div class="bg-slate-900/50 p-3 rounded-xl border border-slate-700">
+                        <p class="text-[10px] text-slate-500 uppercase">Wait</p>
+                        <p id="st1-waiting" class="text-2xl font-bold">--</p>
+                    </div>
+                    <div class="bg-slate-900/50 p-3 rounded-xl border border-slate-700">
+                        <p class="text-[10px] text-slate-500 uppercase">Ready</p>
+                        <p id="st1-ready" class="text-2xl font-bold">--</p>
+                    </div>
+                </div>
+            </div>
+            <footer class="mt-6 pt-4 border-t border-slate-700">
+                <p id="st1-remarks" class="text-lg text-slate-300 text-center italic">Ready</p>
+            </footer>
+        </section>
+
+        <section class="bg-slate-800/50 border border-slate-700 rounded-3xl p-6 flex flex-col justify-between shadow-xl">
+            <div class="flex justify-between items-start border-b border-slate-700 pb-4 mb-4">
+                <h2 class="text-4xl font-bold text-amber-400">Station 02</h2>
+                <span class="bg-green-500/20 text-green-400 px-3 py-1 rounded-full text-xs font-mono border border-green-500/30">LIVE</span>
+            </div>
+            <div class="space-y-6">
+                <div class="text-center">
+                    <p class="text-slate-400 uppercase tracking-widest text-sm">Ongoing</p>
+                    <p id="st2-ongoing" class="text-8xl font-black text-white">--</p>
+                </div>
+                <div class="grid grid-cols-3 gap-2 text-center">
+                    <div class="bg-slate-900/50 p-3 rounded-xl border border-slate-700">
+                        <p class="text-[10px] text-slate-500 uppercase">Next</p>
+                        <p id="st2-next" class="text-2xl font-bold text-indigo-300">--</p>
+                    </div>
+                    <div class="bg-slate-900/50 p-3 rounded-xl border border-slate-700">
+                        <p class="text-[10px] text-slate-500 uppercase">Wait</p>
+                        <p id="st2-waiting" class="text-2xl font-bold">--</p>
+                    </div>
+                    <div class="bg-slate-900/50 p-3 rounded-xl border border-slate-700">
+                        <p class="text-[10px] text-slate-500 uppercase">Ready</p>
+                        <p id="st2-ready" class="text-2xl font-bold">--</p>
+                    </div>
+                </div>
+            </div>
+            <footer class="mt-6 pt-4 border-t border-slate-700">
+                <p id="st2-remarks" class="text-lg text-slate-300 text-center italic">Ready</p>
+            </footer>
+        </section>
+
+        <section class="bg-slate-800/50 border border-slate-700 rounded-3xl p-6 flex flex-col justify-between shadow-xl">
+            <div class="flex justify-between items-start border-b border-slate-700 pb-4 mb-4">
+                <h2 class="text-4xl font-bold text-amber-400">Station 03</h2>
+                <span class="bg-green-500/20 text-green-400 px-3 py-1 rounded-full text-xs font-mono border border-green-500/30">LIVE</span>
+            </div>
+            <div class="space-y-6">
+                <div class="text-center">
+                    <p class="text-slate-400 uppercase tracking-widest text-sm">Ongoing</p>
+                    <p id="st3-ongoing" class="text-8xl font-black text-white">--</p>
+                </div>
+                <div class="grid grid-cols-3 gap-2 text-center">
+                    <div class="bg-slate-900/50 p-3 rounded-xl border border-slate-700">
+                        <p class="text-[10px] text-slate-500 uppercase">Next</p>
+                        <p id="st3-next" class="text-2xl font-bold text-indigo-300">--</p>
+                    </div>
+                    <div class="bg-slate-900/50 p-3 rounded-xl border border-slate-700">
+                        <p class="text-[10px] text-slate-500 uppercase">Wait</p>
+                        <p id="st3-waiting" class="text-2xl font-bold">--</p>
+                    </div>
+                    <div class="bg-slate-900/50 p-3 rounded-xl border border-slate-700">
+                        <p class="text-[10px] text-slate-500 uppercase">Ready</p>
+                        <p id="st3-ready" class="text-2xl font-bold">--</p>
+                    </div>
+                </div>
+            </div>
+            <footer class="mt-6 pt-4 border-t border-slate-700">
+                <p id="st3-remarks" class="text-lg text-slate-300 text-center italic">Ready</p>
+            </footer>
+        </section>
+
+    </main>
+
+    <footer class="p-4 bg-slate-950 text-slate-600 text-[10px] flex justify-between uppercase tracking-widest mt-auto">
+        <span>System: Online</span>
+        <span id="last-update">Last Updated: --:--:--</span>
+    </footer>
+
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+    <script>
+
+      const firebaseConfig = {
+        apiKey: "AIzaSyAeodb0vREvOcd-683q-E7OWVfRFyvVK7s",
+        authDomain: "vivavocemanager.firebaseapp.com",
+        databaseURL: "https://vivavocemanager-default-rtdb.asia-southeast1.firebasedatabase.app",
+        projectId: "vivavocemanager",
+        storageBucket: "vivavocemanager.firebasestorage.app",
+        messagingSenderId: "609230399343",
+        appId: "1:609230399343:web:1525d72e5ab418cfb6ea9a"
+      };
+
+  // Initialize Firebase
+  if (!firebase.apps.length) {
+      firebase.initializeApp(firebaseConfig);
+  }
+  const db = firebase.database();
+
+  // 3. Listen for Global Updates
+  db.ref('global').on('value', (snapshot) => {
+    const data = snapshot.val();
+    if (data) {
+      document.getElementById('announcement').innerText = data.announcement || "Viva-Voce Session Active";
+      document.getElementById('global-comments').innerText = data.comments || "";
+    }
+  });
+
+  // 4. Listen for Station Updates (1, 2, and 3)
+  [1, 2, 3].forEach(id => {
+    db.ref('stations/st' + id).on('value', (snapshot) => {
+      const data = snapshot.val();
+      if (data) {
+        document.getElementById(`st${id}-ongoing`).innerText = data.ongoing || "--";
+        document.getElementById(`st${id}-next`).innerText = data.next || "--";
+        document.getElementById(`st${id}-waiting`).innerText = data.waiting || "--";
+        document.getElementById(`st${id}-ready`).innerText = data.ready || "--";
+        document.getElementById(`st${id}-remarks`).innerText = data.remarks || "";
+
+        // Update the "Last Updated" timestamp in the footer
+        document.getElementById('last-update').innerText = "Last Updated: " + new Date().toLocaleTimeString();
+      }
+    });
+  });
+</script>
+</body>
+</html>
