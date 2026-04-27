@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Viva Admin">
@@ -11,14 +13,21 @@
             padding-bottom: env(safe-area-inset-bottom);
         }
     </style>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>Viva-Voce Display Station</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         body { background-color: #0f172a; } /* Slate 900 */
     </style>
 </head>
+<audio id="bell-sound" src="https://assets.mixkit.co/active_storage/sfx/113/113-preview.mp3" preload="auto"></audio>
+
+<div id="sound-overlay" class="fixed inset-0 bg-slate-900/90 z-[100] flex flex-col items-center justify-center transition-opacity duration-500">
+    <button onclick="enableAudio()" class="bg-indigo-600 hover:bg-indigo-500 text-white px-8 py-4 rounded-2xl text-xl font-bold shadow-2xl">
+        Click to Start Session & Enable Bell 🔔
+    </button>
+    <p class="text-slate-400 mt-4 text-sm">Browsers require a click to play sounds.</p>
+</div>
 <body class="text-slate-100 min-h-screen flex flex-col font-sans">
 
     <header class="p-6 bg-indigo-900 shadow-2xl border-b border-indigo-400/30">
@@ -28,6 +37,17 @@
         <p id="global-comments" class="text-lg md:text-xl text-indigo-200 text-center mt-2 italic">
             Please keep your IDs ready and wait for your roll number.
         </p>
+        <div class="flex justify-between items-center mt-4 border-t border-indigo-400/20 pt-4">
+            <div class="text-left">
+                <p class="text-[10px] uppercase tracking-widest text-indigo-300">Local Time</p>
+                <p id="local-clock" class="text-2xl font-mono font-bold">00:00:00</p>
+            </div>
+
+            <div class="text-right">
+                <p class="text-[10px] uppercase tracking-widest text-indigo-300">Station Timer (4m Loop)</p>
+                <p id="session-timer" class="text-4xl font-mono font-black text-amber-400">04:00</p>
+            </div>
+        </div>
     </header>
 
     <main class="flex-grow p-6 grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -132,23 +152,126 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
     <script>
+         const firebaseConfig = {
+            apiKey: "AIzaSyAeodb0vREvOcd-683q-E7OWVfRFyvVK7s",
+            authDomain: "vivavocemanager.firebaseapp.com",
+            databaseURL: "https://vivavocemanager-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "vivavocemanager",
+            storageBucket: "vivavocemanager.firebasestorage.app",
+            messagingSenderId: "609230399343",
+            appId: "1:609230399343:web:1525d72e5ab418cfb6ea9a"
+          };
+         if (!firebase.apps.length) {
+              firebase.initializeApp(firebaseConfig);
+         }
+         const db = firebase.database();
 
-      const firebaseConfig = {
-        apiKey: "AIzaSyAeodb0vREvOcd-683q-E7OWVfRFyvVK7s",
-        authDomain: "vivavocemanager.firebaseapp.com",
-        databaseURL: "https://vivavocemanager-default-rtdb.asia-southeast1.firebasedatabase.app",
-        projectId: "vivavocemanager",
-        storageBucket: "vivavocemanager.firebasestorage.app",
-        messagingSenderId: "609230399343",
-        appId: "1:609230399343:web:1525d72e5ab418cfb6ea9a"
-      };
+ // 1. Local Clock Logic
+        setInterval(() => {
+            document.getElementById('local-clock').innerText = new Date().toLocaleTimeString();
+        }, 1000);
 
-  // Initialize Firebase
-  if (!firebase.apps.length) {
-      firebase.initializeApp(firebaseConfig);
-  }
-  const db = firebase.database();
+        // 2. Synchronized Timer Logic
+        let timerStartTime = 0;
+        let timerStatus = 'stopped';
+        let timerData = null;
 
+        const bellSound = document.getElementById('bell-sound');
+        //Adding Bell audio
+        let bellPlayed = false; // Prevents the bell from ringing multiple times in the same second
+
+        function enableAudio() {
+            const bell = document.getElementById('bell-sound');
+            // Attempt to unlock audio
+            bell.play().then(() => {
+                bell.pause();
+                bell.currentTime = 0;
+            }).catch(e => console.log("Audio unlock attempted"));
+            document.getElementById('sound-overlay').style.display = 'none';
+        }
+         db.ref('timer').on('value', (snapshot) => {
+    timerData = snapshot.val();
+    if (timerData && timerData.status === 'running') {
+        timerStartTime = timerData.startTime;
+        timerStatus = 'running';
+    } else {
+        timerStartTime = 0;
+        timerStatus = 'stopped';
+        document.getElementById('session-timer').innerText = "04:00";
+    }
+});
+
+        setInterval(() => {
+    if (timerStatus !== 'running' || timerStartTime === 0) return;
+
+    const now = Date.now();
+    const elapsedMs = now - timerStartTime;
+    const fourMinMs = 4 * 60 * 1000;
+
+    // 1. Calculate Rounds (0, 1, 2, 3...)
+    const currentRound = Math.floor(elapsedMs / fourMinMs);
+
+    // 2. Automation: Update all 3 stations based on the round
+    [1, 2, 3].forEach(id => {
+        const baseRoll = timerData[`st${id}_base`] || 1;
+        let maxRoll;
+        if (id === 1) {
+            // Station 1 ends where Station 2 begins
+            maxRoll = parseInt(timerData.st2_base) ? parseInt(timerData.st2_base) - 1 : baseRoll + 11;
+        } else if (id === 2) {
+            // Station 2 ends where Station 3 begins
+            maxRoll = parseInt(timerData.st3_base) ? parseInt(timerData.st3_base) - 1 : baseRoll + 11;
+        } else {
+            // Station 3 is the last, so we use a fixed range (e.g., +11)
+            maxRoll = baseRoll + 11;
+        }
+
+        const ongoing = baseRoll + currentRound;
+        const next = ongoing + 1;
+        const wait = ongoing + 2;
+        const ready = ongoing + 3;
+
+        // Helper to check if we passed the 12-student limit
+        // Replace your old checkLimit with this:
+        const checkLimit = (num) => {
+            const n = parseInt(num);
+            const m = parseInt(maxRoll);
+            return (n > m) ? "--" : n;
+        };
+
+        document.getElementById(`st${id}-ongoing`).innerText = checkLimit(ongoing);
+        document.getElementById(`st${id}-next`).innerText = checkLimit(next);
+        document.getElementById(`st${id}-waiting`).innerText = checkLimit(wait);
+        document.getElementById(`st${id}-ready`).innerText = checkLimit(ready);
+
+        const remarkEl = document.getElementById(`st${id}-remarks`);
+                if (ongoing > maxRoll) {
+                    remarkEl.innerText = "Station Complete";
+                    remarkEl.classList.add('text-red-400');
+                } else {
+                    // Reset text when the station is active
+                    remarkEl.innerText = "Session Active";
+                    remarkEl.classList.remove('text-red-400');
+                }
+        });
+
+    // 3. Normal Timer Display
+    const remainingMs = fourMinMs - (elapsedMs % fourMinMs);
+    const m = Math.floor(remainingMs / 60000);
+    const s = Math.floor((remainingMs % 60000) / 1000);
+    document.getElementById('session-timer').innerText = `${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;
+
+    // 4. Bell Logic (Keep your existing bell code here)
+    if (m === 0 && s === 0 && !bellPlayed) {
+        bellSound.play();
+        bellPlayed = true;
+    }
+    if (s > 0) bellPlayed = false;
+
+}, 1000);
+        db.ref('timer/triggerBell').on('value', (snap) => {
+            if(snap.val()) bellSound.play();
+        });
   // 3. Listen for Global Updates
   db.ref('global').on('value', (snapshot) => {
     const data = snapshot.val();
@@ -168,7 +291,6 @@
         document.getElementById(`st${id}-waiting`).innerText = data.waiting || "--";
         document.getElementById(`st${id}-ready`).innerText = data.ready || "--";
         document.getElementById(`st${id}-remarks`).innerText = data.remarks || "";
-
         // Update the "Last Updated" timestamp in the footer
         document.getElementById('last-update').innerText = "Last Updated: " + new Date().toLocaleTimeString();
       }

@@ -27,6 +27,22 @@
     </header>
 
     <main class="p-4 space-y-6 max-w-md mx-auto">
+        <section class="bg-slate-800 rounded-2xl p-5 shadow-lg border border-slate-700">
+            <h2 class="text-xs font-bold text-slate-400 uppercase mb-4 tracking-tighter">Timer Control</h2>
+            <div class="flex gap-2">
+                <button onclick="startTimer()"
+                        class="flex-grow bg-indigo-600 active:bg-indigo-700 text-white font-bold py-3 rounded-xl shadow-lg">
+                    Start / Reset
+                </button>
+                <button onclick="stopTimer()"
+                        class="px-4 bg-slate-700 text-slate-300 font-bold py-3 rounded-xl">
+                    Stop
+                </button>
+                <button onclick="testBell()" class="font-bold text-xs px-6 bg-green-600 rounded-xl py-3 text-white tracking-widest"> 🛎️ Bell
+                </button>
+            </div>
+            <p id="timer-status" class="text-[10px] text-center mt-2 text-slate-500 uppercase">Timer Ready</p>
+        </section>
 
         <section class="bg-slate-800 rounded-2xl p-5 shadow-lg border border-slate-700">
             <h2 class="text-xs font-bold text-slate-400 uppercase mb-4 tracking-tighter">Global Settings</h2>
@@ -42,7 +58,7 @@
                            class="w-full bg-slate-900 border border-slate-600 rounded-lg p-3 text-white text-sm">
                 </div>
                 <button onclick="updateGlobal()"
-                        class="w-full bg-indigo-600 active:bg-indigo-700 text-white font-bold py-3 rounded-xl transition-all shadow-lg shadow-indigo-500/20">
+                        class="w-full bg-indigo-600 active:bg-indigo-700 text-white font-bold py-3 rounded-xl shadow-lg">
                     Update Global Display
                 </button>
             </div>
@@ -52,194 +68,156 @@
             <div class="flex justify-between items-center mb-4">
                 <h2 class="text-lg font-bold text-amber-400">Station 01</h2>
                 <span class="text-[10px] text-green-500 font-mono">CONNECTED</span>
+                <input id="st1-start-roll" type="number" value="1" class="w-10 bg-slate-700 text-white text-[10px] rounded p-1 border border-slate-600 text-center">
             </div>
-
             <div class="grid grid-cols-2 gap-3 mb-4">
                 <div class="col-span-2">
                     <label class="block text-[10px] text-slate-500 uppercase">Ongoing Roll</label>
-                    <input id="st1-inp-ongoing" type="text" inputmode="numeric" placeholder="--"
+                    <input id="st1-inp-ongoing" type="text" inputmode="text" placeholder="--"
                            class="w-full bg-slate-900 border border-slate-600 rounded-lg p-4 text-2xl font-black text-center">
                 </div>
-                <div>
-                    <label class="block text-[10px] text-slate-500 uppercase text-center">Next</label>
-                    <input id="st1-inp-next" type="text" inputmode="numeric" placeholder="--"
-                           class="w-full bg-slate-900 border border-slate-600 rounded-lg p-2 text-center font-bold">
-                </div>
-                <div>
-                    <label class="block text-[10px] text-slate-500 uppercase text-center">Waiting</label>
-                    <input id="st1-inp-waiting" type="text" inputmode="numeric" placeholder="--"
-                           class="w-full bg-slate-900 border border-slate-600 rounded-lg p-2 text-center font-bold">
-                </div>
+                <input id="st1-inp-next" type="text" inputmode="text" placeholder="Next" class="bg-slate-900 border border-slate-600 rounded-lg p-2 text-center font-bold">
+                <input id="st1-inp-waiting" type="text" inputmode="text" placeholder="Wait" class="bg-slate-900 border border-slate-600 rounded-lg p-2 text-center font-bold">
                 <div class="col-span-2">
-                    <label class="block text-[10px] text-slate-500 uppercase">Get Ready</label>
-                    <input id="st1-inp-ready" type="text" inputmode="text" placeholder="--"
-                           class="w-full bg-slate-900 border border-slate-600 rounded-lg p-2 text-center font-bold">
-                </div>
-                <div class="col-span-2">
-                    <label class="block text-[10px] text-slate-500 uppercase">Remarks</label>
-                    <input id="st1-inp-remarks" type="text" placeholder="Ready"
-                           class="w-full bg-slate-900 border border-slate-600 rounded-lg p-2 text-sm">
+                    <input id="st1-inp-remarks" type="text" placeholder="Remarks" class="w-full bg-slate-900 border border-slate-600 rounded-lg p-2 text-sm">
                 </div>
             </div>
-            <button onclick="updateStation(1)"
-                    class="w-full bg-emerald-600 active:bg-emerald-700 text-white font-bold py-3 rounded-xl shadow-lg shadow-emerald-500/20">
-                Push Station 01 Updates
-            </button>
+            <button onclick="updateStation(1)" class="w-full bg-emerald-600 active:bg-emerald-700 text-white font-bold py-3 rounded-xl shadow-lg">Push Station 01 Updates</button>
         </section>
 
         <section class="bg-slate-800 rounded-2xl p-5 shadow-lg border border-slate-700">
             <div class="flex justify-between items-center mb-4">
                 <h2 class="text-lg font-bold text-amber-400">Station 02</h2>
                 <span class="text-[10px] text-green-500 font-mono">CONNECTED</span>
+                <input id="st2-start-roll" type="number" value="13" class="w-10 bg-slate-700 text-white text-[10px] rounded p-1 border border-slate-600 text-center">
             </div>
-
             <div class="grid grid-cols-2 gap-3 mb-4">
                 <div class="col-span-2">
-                    <label class="block text-[10px] text-slate-500 uppercase">Ongoing Roll</label>
-                    <input id="st2-inp-ongoing" type="text" inputmode="numeric" placeholder="--"
-                           class="w-full bg-slate-900 border border-slate-600 rounded-lg p-4 text-2xl font-black text-center">
+                    <input id="st2-inp-ongoing" type="text" inputmode="text" placeholder="--" class="w-full bg-slate-900 border border-slate-600 rounded-lg p-4 text-2xl font-black text-center">
                 </div>
-                <div>
-                    <label class="block text-[10px] text-slate-500 uppercase text-center">Next</label>
-                    <input id="st2-inp-next" type="text" inputmode="numeric" placeholder="--"
-                           class="w-full bg-slate-900 border border-slate-600 rounded-lg p-2 text-center font-bold">
-                </div>
-                <div>
-                    <label class="block text-[10px] text-slate-500 uppercase text-center">Waiting</label>
-                    <input id="st2-inp-waiting" type="text" inputmode="numeric" placeholder="--"
-                           class="w-full bg-slate-900 border border-slate-600 rounded-lg p-2 text-center font-bold">
-                </div>
-                <div class="col-span-2">
-                    <label class="block text-[10px] text-slate-500 uppercase">Get Ready</label>
-                    <input id="st2-inp-ready" type="text" inputmode="text" placeholder="--"
-                           class="w-full bg-slate-900 border border-slate-600 rounded-lg p-2 text-center font-bold">
-                </div>
-                <div class="col-span-2">
-                    <label class="block text-[10px] text-slate-500 uppercase">Remarks</label>
-                    <input id="st2-inp-remarks" type="text" placeholder="Ready"
-                           class="w-full bg-slate-900 border border-slate-600 rounded-lg p-2 text-sm">
-                </div>
+                <input id="st2-inp-next" type="text" inputmode="text" placeholder="Next" class="bg-slate-900 border border-slate-600 rounded-lg p-2 text-center font-bold">
+                <input id="st2-inp-waiting" type="text" inputmode="text" placeholder="Wait" class="bg-slate-900 border border-slate-600 rounded-lg p-2 text-center font-bold">
             </div>
-            <button onclick="updateStation(2)"
-                    class="w-full bg-emerald-600 active:bg-emerald-700 text-white font-bold py-3 rounded-xl shadow-lg shadow-emerald-500/20">
-                Push Station 02 Updates
-            </button>
+            <button onclick="updateStation(2)" class="w-full bg-emerald-600 active:bg-emerald-700 text-white font-bold py-3 rounded-xl shadow-lg">Push Station 02 Updates</button>
         </section>
 
         <section class="bg-slate-800 rounded-2xl p-5 shadow-lg border border-slate-700">
             <div class="flex justify-between items-center mb-4">
                 <h2 class="text-lg font-bold text-amber-400">Station 03</h2>
                 <span class="text-[10px] text-green-500 font-mono">CONNECTED</span>
+                <input id="st3-start-roll" type="number" value="25" class="w-10 bg-slate-700 text-white text-[10px] rounded p-1 border border-slate-600 text-center">
             </div>
-
             <div class="grid grid-cols-2 gap-3 mb-4">
                 <div class="col-span-2">
-                    <label class="block text-[10px] text-slate-500 uppercase">Ongoing Roll</label>
-                    <input id="st3-inp-ongoing" type="text" inputmode="numeric" placeholder="--"
-                           class="w-full bg-slate-900 border border-slate-600 rounded-lg p-4 text-2xl font-black text-center">
+                    <input id="st3-inp-ongoing" type="text" inputmode="text" placeholder="--" class="w-full bg-slate-900 border border-slate-600 rounded-lg p-4 text-2xl font-black text-center">
                 </div>
-                <div>
-                    <label class="block text-[10px] text-slate-500 uppercase text-center">Next</label>
-                    <input id="st3-inp-next" type="text" inputmode="numeric" placeholder="--"
-                           class="w-full bg-slate-900 border border-slate-600 rounded-lg p-2 text-center font-bold">
-                </div>
-                <div>
-                    <label class="block text-[10px] text-slate-500 uppercase text-center">Waiting</label>
-                    <input id="st3-inp-waiting" type="text" inputmode="numeric" placeholder="--"
-                           class="w-full bg-slate-900 border border-slate-600 rounded-lg p-2 text-center font-bold">
-                </div>
-                <div class="col-span-2">
-                    <label class="block text-[10px] text-slate-500 uppercase">Get Ready</label>
-                    <input id="st3-inp-ready" type="text" inputmode="text" placeholder="--"
-                           class="w-full bg-slate-900 border border-slate-600 rounded-lg p-2 text-center font-bold">
-                </div>
-                <div class="col-span-2">
-                    <label class="block text-[10px] text-slate-500 uppercase">Remarks</label>
-                    <input id="st3-inp-remarks" type="text" placeholder="Ready"
-                           class="w-full bg-slate-900 border border-slate-600 rounded-lg p-2 text-sm">
-                </div>
+                <input id="st3-inp-next" type="text" inputmode="text" placeholder="Next" class="bg-slate-900 border border-slate-600 rounded-lg p-2 text-center font-bold">
+                <input id="st3-inp-waiting" type="text" inputmode="text" placeholder="Wait" class="bg-slate-900 border border-slate-600 rounded-lg p-2 text-center font-bold">
             </div>
-            <button onclick="updateStation(3)"
-                    class="w-full bg-emerald-600 active:bg-emerald-700 text-white font-bold py-3 rounded-xl shadow-lg shadow-emerald-500/20">
-                Push Station 03 Updates
-            </button>
+            <button onclick="updateStation(3)" class="w-full bg-emerald-600 active:bg-emerald-700 text-white font-bold py-3 rounded-xl shadow-lg">Push Station 03 Updates</button>
         </section>
-        <section>
-            <div style="display: flex;justify-content: center;">
-            <button onclick="resetStation()"
-                class="px-6 bg-red-700 active:bg-slate-700 text-slate-300 font-bold py-3 rounded-xl transition-colors"> Reset All Stations
-            </button>
-            </div>
-        </section>
-        <p class="text-center text-slate-600 text-[10px] uppercase tracking-widest pt-4">End of Controls</p>
 
+        <section class="flex justify-center">
+            <button onclick="resetStation()"
+                class="px-8 bg-red-700 active:bg-red-800 text-white font-bold py-4 rounded-xl shadow-xl uppercase tracking-widest text-xs">
+                Master Reset All Data
+            </button>
+        </section>
     </main>
 
     <nav class="fixed bottom-0 left-0 right-0 bg-slate-900 border-t border-slate-700 p-2 flex justify-around text-[10px] text-slate-500">
-        <div class="flex flex-col items-center text-indigo-400">
-            <span class="text-lg">📱</span>
-            <span>Admin</span>
-        </div>
-        <div class="flex flex-col items-center" onclick="window.location.href='display.html'">
-            <span class="text-lg">📺</span>
-            <span>View Display</span>
-        </div>
+        <div class="flex flex-col items-center text-indigo-400"><span>📱</span><span>Admin</span></div>
+        <div class="flex flex-col items-center" onclick="window.location.href='display.html'"><span>📺</span><span>View Display</span></div>
     </nav>
+
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
-<script>
-  const firebaseConfig = {
-    apiKey: "AIzaSyAeodb0vREvOcd-683q-E7OWVfRFyvVK7s",
-    authDomain: "vivavocemanager.firebaseapp.com",
-    databaseURL: "https://vivavocemanager-default-rtdb.asia-southeast1.firebasedatabase.app",
-    projectId: "vivavocemanager",
-    storageBucket: "vivavocemanager.firebasestorage.app",
-    messagingSenderId: "609230399343",
-    appId: "1:609230399343:web:1525d72e5ab418cfb6ea9a"
-  };
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyAeodb0vREvOcd-683q-E7OWVfRFyvVK7s",
+            authDomain: "vivavocemanager.firebaseapp.com",
+            databaseURL: "https://vivavocemanager-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "vivavocemanager",
+            storageBucket: "vivavocemanager.firebasestorage.app",
+            messagingSenderId: "609230399343",
+            appId: "1:609230399343:web:1525d72e5ab418cfb6ea9a"
+        };
 
-  firebase.initializeApp(firebaseConfig);
-  const db = firebase.database();
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
 
-  function updateGlobal() {
-    db.ref('global').set({
-      announcement: document.getElementById('inp-announcement').value,
-      comments: document.getElementById('inp-global-comments').value
-    });
-  }
+        function startTimer() {
+            db.ref('timer').set({
+                startTime: Date.now(),
+                status: 'running',
+                st1_base: parseInt(document.getElementById('st1-start-roll').value) || 1,
+                st2_base: parseInt(document.getElementById('st2-start-roll').value) || 13,
+                st3_base: parseInt(document.getElementById('st3-start-roll').value) || 25
+            }).then(() => {
+                document.getElementById('timer-status').innerText = "Timer Running";
+            });
+        }
 
-  function updateStation(id) {
-    db.ref('stations/st' + id).set({
-      ongoing: document.getElementById(`st${id}-inp-ongoing`).value,
-      next: document.getElementById(`st${id}-inp-next`).value,
-      waiting: document.getElementById(`st${id}-inp-waiting`).value,
-      ready: document.getElementById(`st${id}-inp-ready`).value,
-      remarks: document.getElementById(`st${id}-inp-remarks`).value
-    }).then(() => alert("Station " + id + " Updated!"));
-  }
+        function stopTimer() {
+            db.ref('timer').update({
+                startTime: 0,
+                status: 'stopped'
+            }).then(() => {
+                document.getElementById('timer-status').innerText = "Timer Stopped";
+            });
+        }
 
-    // Function to clear all fields for a specific station
-  function resetStation() {
-    if (confirm(`Are you sure you want to reset Station `)) {
-      const resetData = {
-        ongoing: "--",
-        next: "--",
-        waiting: "--",
-        ready: "--",
-        remarks: "Station Reset"
-      };
-      [1, 2, 3].forEach(id => {
-      db.ref('stations/st' + id).set(resetData)
-        // Also clear the input fields in the Admin UI
-        document.getElementById(`st${id}-inp-ongoing`).value = "";
-        document.getElementById(`st${id}-inp-next`).value = "";
-        document.getElementById(`st${id}-inp-waiting`).value = "";
-        document.getElementById(`st${id}-inp-ready`).value = "";
-        document.getElementById(`st${id}-inp-remarks`).value = "";
-      });
-      alert(`All Stations  Cleared!`);
-    }
-  }
-</script>
+        function updateGlobal() {
+            db.ref('global').set({
+                announcement: document.getElementById('inp-announcement').value,
+                comments: document.getElementById('inp-global-comments').value
+            });
+        }
+
+        function updateStation(id) {
+            db.ref('stations/st' + id).set({
+                ongoing: document.getElementById(`st${id}-inp-ongoing`).value || "--",
+                next: document.getElementById(`st${id}-inp-next`).value || "--",
+                waiting: document.getElementById(`st${id}-inp-waiting`).value || "--",
+                ready: "--",
+                remarks: document.getElementById(`st${id}-inp-remarks`) ? document.getElementById(`st${id}-inp-remarks`).value : "Ready"
+            }).then(() => alert("Station " + id + " Updated!"));
+        }
+
+        function resetStation() {
+            if (confirm("Stop Timer and Reset ALL Station data?")) {
+                // 1. Stop the Timer first so automation stops
+                db.ref('timer').set({
+                    startTime: 0,
+                    status: 'stopped'
+                });
+
+                // 2. Clear Station data in Firebase
+                const resetData = {
+                    ongoing: "--",
+                    next: "--",
+                    waiting: "--",
+                    ready: "--",
+                    remarks: "Ready"
+                };
+
+                [1, 2, 3].forEach(id => {
+                    db.ref('stations/st' + id).set(resetData);
+                    // 3. Clear Admin UI fields
+                    document.getElementById(`st${id}-inp-ongoing`).value = "";
+                    document.getElementById(`st${id}-inp-next`).value = "";
+                    document.getElementById(`st${id}-inp-waiting`).value = "";
+                    if(document.getElementById(`st${id}-inp-remarks`)) document.getElementById(`st${id}-inp-remarks`).value = "";
+                });
+
+                document.getElementById('timer-status').innerText = "System Reset";
+                alert("All Stations and Timer Reset!");
+            }
+        }
+
+        function testBell() {
+            db.ref('timer/triggerBell').set(Date.now());
+        }
+    </script>
 </body>
 </html>
