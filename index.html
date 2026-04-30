@@ -42,10 +42,9 @@
                 <p class="text-[10px] uppercase tracking-widest text-indigo-300">Local Time</p>
                 <p id="local-clock" class="text-2xl font-mono font-bold">00:00:00</p>
             </div>
-
             <div class="text-right">
                 <p class="text-[10px] uppercase tracking-widest text-indigo-300">Station Timer (4m Loop)</p>
-                <p id="session-timer" class="text-4xl font-mono font-black text-amber-400">04:00</p>
+                <p id="session-timer" class="text-4xl font-mono font-black text-amber-400">01:00</p>
             </div>
         </div>
     </header>
@@ -55,7 +54,7 @@
         <section class="bg-slate-800/50 border border-slate-700 rounded-3xl p-6 flex flex-col justify-between shadow-xl">
             <div class="flex justify-between items-start border-b border-slate-700 pb-4 mb-4">
                 <h2 class="text-4xl font-bold text-amber-400">Station 01</h2>
-                <span class="bg-green-500/20 text-green-400 px-3 py-1 rounded-full text-xs font-mono border border-green-500/30">LIVE</span>
+                <span id="st1-status" class="bg-green-500/20 text-green-400 px-3 py-1 rounded-full text-xs font-mono border border-green-500/30">Active</span>
             </div>
             <div class="space-y-6">
                 <div class="text-center">
@@ -77,15 +76,15 @@
                     </div>
                 </div>
             </div>
-            <footer class="mt-6 pt-4 border-t border-slate-700">
-                <p id="st1-remarks" class="text-lg text-slate-300 text-center italic">Ready</p>
-            </footer>
+<!--            <footer class="mt-6 pt-4 border-t border-slate-700">-->
+<!--                <p id="st1-remarks" class="text-lg text-slate-300 text-center italic">Ready</p>-->
+<!--            </footer>-->
         </section>
 
         <section class="bg-slate-800/50 border border-slate-700 rounded-3xl p-6 flex flex-col justify-between shadow-xl">
             <div class="flex justify-between items-start border-b border-slate-700 pb-4 mb-4">
                 <h2 class="text-4xl font-bold text-amber-400">Station 02</h2>
-                <span class="bg-green-500/20 text-green-400 px-3 py-1 rounded-full text-xs font-mono border border-green-500/30">LIVE</span>
+                <span id="st2-status" class="bg-green-500/20 text-green-400 px-3 py-1 rounded-full text-xs font-mono border border-green-500/30">Active</span>
             </div>
             <div class="space-y-6">
                 <div class="text-center">
@@ -107,15 +106,15 @@
                     </div>
                 </div>
             </div>
-            <footer class="mt-6 pt-4 border-t border-slate-700">
-                <p id="st2-remarks" class="text-lg text-slate-300 text-center italic">Ready</p>
-            </footer>
+<!--            <footer class="mt-6 pt-4 border-t border-slate-700">-->
+<!--                <p id="st2-remarks" class="text-lg text-slate-300 text-center italic">Ready</p>-->
+<!--            </footer>-->
         </section>
 
         <section class="bg-slate-800/50 border border-slate-700 rounded-3xl p-6 flex flex-col justify-between shadow-xl">
             <div class="flex justify-between items-start border-b border-slate-700 pb-4 mb-4">
                 <h2 class="text-4xl font-bold text-amber-400">Station 03</h2>
-                <span class="bg-green-500/20 text-green-400 px-3 py-1 rounded-full text-xs font-mono border border-green-500/30">LIVE</span>
+                <span id="st3-status" class="bg-green-500/20 text-green-400 px-3 py-1 rounded-full text-xs font-mono border border-green-500/30">Active</span>
             </div>
             <div class="space-y-6">
                 <div class="text-center">
@@ -137,11 +136,10 @@
                     </div>
                 </div>
             </div>
-            <footer class="mt-6 pt-4 border-t border-slate-700">
-                <p id="st3-remarks" class="text-lg text-slate-300 text-center italic">Ready</p>
-            </footer>
+<!--            <footer class="mt-6 pt-4 border-t border-slate-700">-->
+<!--                <p id="st3-remarks" class="text-lg text-slate-300 text-center italic">Ready</p>-->
+<!--            </footer>-->
         </section>
-
     </main>
 
     <footer class="p-4 bg-slate-950 text-slate-600 text-[10px] flex justify-between uppercase tracking-widest mt-auto">
@@ -197,7 +195,7 @@
     } else {
         timerStartTime = 0;
         timerStatus = 'stopped';
-        document.getElementById('session-timer').innerText = "04:00";
+        document.getElementById('session-timer').innerText = "01:00";
     }
 });
 
@@ -206,7 +204,7 @@
 
     const now = Date.now();
     const elapsedMs = now - timerStartTime;
-    const fourMinMs = 4 * 60 * 1000;
+    const fourMinMs = 1 * 60 * 1000;
 
     // 1. Calculate Rounds (0, 1, 2, 3...)
     const currentRound = Math.floor(elapsedMs / fourMinMs);
@@ -244,15 +242,16 @@
         document.getElementById(`st${id}-waiting`).innerText = checkLimit(wait);
         document.getElementById(`st${id}-ready`).innerText = checkLimit(ready);
 
+        const statusEl = document.getElementById(`st${id}-status`);
         const remarkEl = document.getElementById(`st${id}-remarks`);
-                if (ongoing > maxRoll) {
-                    remarkEl.innerText = "Station Complete";
-                    remarkEl.classList.add('text-red-400');
-                } else {
-                    // Reset text when the station is active
-                    remarkEl.innerText = "Session Active";
-                    remarkEl.classList.remove('text-red-400');
-                }
+
+        if (ongoing > maxRoll) {
+            statusEl.innerText = "Closed";
+            statusEl.className = "bg-red-500/20 text-red-400 px-3 py-1 rounded-full text-xs font-mono border border-red-500/30";
+        } else {
+            statusEl.innerText = "Active";
+            statusEl.className = "bg-green-500/20 text-green-400 px-3 py-1 rounded-full text-xs font-mono border border-green-500/30";
+        }
         });
 
     // 3. Normal Timer Display
