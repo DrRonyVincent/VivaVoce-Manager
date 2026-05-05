@@ -22,279 +22,310 @@
 </head>
 <audio id="bell-sound" src="https://assets.mixkit.co/active_storage/sfx/113/113-preview.mp3" preload="auto"></audio>
 
-<div id="sound-overlay" class="fixed inset-0 bg-slate-900/90 z-[100] flex flex-col items-center justify-center transition-opacity duration-500">
-    <button onclick="enableAudio()" class="bg-indigo-600 hover:bg-indigo-500 text-white px-8 py-4 rounded-2xl text-xl font-bold shadow-2xl">
+<div id="sound-overlay"
+     class="fixed inset-0 bg-slate-900/90 z-[100] flex flex-col items-center justify-center transition-opacity duration-500">
+    <button onclick="enableAudio()"
+            class="bg-indigo-600 hover:bg-indigo-500 text-white px-8 py-4 rounded-2xl text-xl font-bold shadow-2xl">
         Click to Start Session & Enable Bell 🔔
     </button>
     <p class="text-slate-400 mt-4 text-sm">Browsers require a click to play sounds.</p>
 </div>
 <body class="text-slate-100 min-h-screen flex flex-col font-sans">
 
-    <header class="p-6 bg-indigo-900 shadow-2xl border-b border-indigo-400/30">
-        <h1 id="announcement" class="text-4xl md:text-5xl font-black text-center tracking-tight uppercase">
-            Viva-Voce Session
-        </h1>
-        <p id="global-comments" class="text-lg md:text-xl text-indigo-200 text-center mt-2 italic">
-            Please keep your IDs ready and wait for your roll number.
-        </p>
-        <div class="flex justify-between items-center mt-4 border-t border-indigo-400/20 pt-4">
-            <div class="text-left">
-                <p class="text-[10px] uppercase tracking-widest text-indigo-300">Local Time</p>
-                <p id="local-clock" class="text-2xl font-mono font-bold">00:00:00</p>
+<header class="p-6 bg-indigo-900 shadow-2xl border-b border-indigo-400/30">
+    <h1 id="announcement" class="text-4xl md:text-5xl font-black text-center tracking-tight uppercase">
+        Viva-Voce Session
+    </h1>
+    <p id="global-comments" class="text-lg md:text-xl text-indigo-200 text-center mt-2 italic">
+        Please keep your IDs ready and wait for your roll number.
+    </p>
+    <div class="flex justify-between items-center mt-4 border-t border-indigo-400/20 pt-4">
+        <div class="text-left">
+            <p class="text-[10px] uppercase tracking-widest text-indigo-300">Local Time</p>
+            <p id="local-clock" class="text-2xl font-mono font-bold">00:00:00</p>
+        </div>
+        <!-- Admin Setup Info (Only shows before session starts) -->
+        <div id="setup-info"
+             class="mt-6 p-4 bg-slate-800/80 border border-indigo-500/50 rounded-2xl flex items-center justify-center gap-6 shadow-2xl transition-all duration-500">
+            <div class="bg-white p-2 rounded-lg">
+                <img id="display-qr" src="" alt="Setup QR" class="w-24 h-24">
             </div>
-            <div class="text-right">
-                <p class="text-[10px] uppercase tracking-widest text-indigo-300">Station Timer (4m Loop)</p>
-                <p id="session-timer" class="text-4xl font-mono font-black text-amber-400">01:00</p>
+            <div class="text-left">
+                <p class="text-indigo-300 text-[10px] uppercase tracking-widest font-bold">Admin Setup Code</p>
+                <p id="display-token-val" class="text-4xl font-mono font-black text-white">------</p>
+                <p class="text-slate-400 text-[10px] mt-1">Scan or use this code on Admin page</p>
             </div>
         </div>
-    </header>
+        <div class="text-right">
+            <p class="text-[10px] uppercase tracking-widest text-indigo-300">Station Timer (4m Loop)</p>
+            <p id="session-timer" class="text-4xl font-mono font-black text-amber-400">01:00</p>
+        </div>
+    </div>
+</header>
 
-    <main class="flex-grow p-6 grid grid-cols-1 lg:grid-cols-3 gap-6">
+<main class="flex-grow p-6 grid grid-cols-1 lg:grid-cols-3 gap-6">
 
-        <section class="bg-slate-800/50 border border-slate-700 rounded-3xl p-6 flex flex-col justify-between shadow-xl">
-            <div class="flex justify-between items-start border-b border-slate-700 pb-4 mb-4">
-                <h2 class="text-4xl font-bold text-amber-400">Station 01</h2>
-                <span id="st1-status" class="bg-green-500/20 text-green-400 px-3 py-1 rounded-full text-xs font-mono border border-green-500/30">Active</span>
+    <section class="bg-slate-800/50 border border-slate-700 rounded-3xl p-6 flex flex-col justify-between shadow-xl">
+        <div class="flex justify-between items-start border-b border-slate-700 pb-4 mb-4">
+            <h2 class="text-4xl font-bold text-amber-400">Station 01</h2>
+            <span id="st1-status"
+                  class="bg-green-500/20 text-green-400 px-3 py-1 rounded-full text-xs font-mono border border-green-500/30">Active</span>
+        </div>
+        <div class="space-y-6">
+            <div class="text-center">
+                <p class="text-slate-400 uppercase tracking-widest text-sm">Ongoing</p>
+                <p id="st1-ongoing" class="text-8xl font-black text-white">--</p>
             </div>
-            <div class="space-y-6">
-                <div class="text-center">
-                    <p class="text-slate-400 uppercase tracking-widest text-sm">Ongoing</p>
-                    <p id="st1-ongoing" class="text-8xl font-black text-white">--</p>
+            <div class="grid grid-cols-3 gap-2 text-center">
+                <div class="bg-slate-900/50 p-3 rounded-xl border border-slate-700">
+                    <p class="text-[10px] text-slate-500 uppercase">Next</p>
+                    <p id="st1-next" class="text-2xl font-bold text-indigo-300">--</p>
                 </div>
-                <div class="grid grid-cols-3 gap-2 text-center">
-                    <div class="bg-slate-900/50 p-3 rounded-xl border border-slate-700">
-                        <p class="text-[10px] text-slate-500 uppercase">Next</p>
-                        <p id="st1-next" class="text-2xl font-bold text-indigo-300">--</p>
-                    </div>
-                    <div class="bg-slate-900/50 p-3 rounded-xl border border-slate-700">
-                        <p class="text-[10px] text-slate-500 uppercase">Wait</p>
-                        <p id="st1-waiting" class="text-2xl font-bold">--</p>
-                    </div>
-                    <div class="bg-slate-900/50 p-3 rounded-xl border border-slate-700">
-                        <p class="text-[10px] text-slate-500 uppercase">Ready</p>
-                        <p id="st1-ready" class="text-2xl font-bold">--</p>
-                    </div>
+                <div class="bg-slate-900/50 p-3 rounded-xl border border-slate-700">
+                    <p class="text-[10px] text-slate-500 uppercase">Wait</p>
+                    <p id="st1-waiting" class="text-2xl font-bold">--</p>
                 </div>
-            </div>
-<!--            <footer class="mt-6 pt-4 border-t border-slate-700">-->
-<!--                <p id="st1-remarks" class="text-lg text-slate-300 text-center italic">Ready</p>-->
-<!--            </footer>-->
-        </section>
-
-        <section class="bg-slate-800/50 border border-slate-700 rounded-3xl p-6 flex flex-col justify-between shadow-xl">
-            <div class="flex justify-between items-start border-b border-slate-700 pb-4 mb-4">
-                <h2 class="text-4xl font-bold text-amber-400">Station 02</h2>
-                <span id="st2-status" class="bg-green-500/20 text-green-400 px-3 py-1 rounded-full text-xs font-mono border border-green-500/30">Active</span>
-            </div>
-            <div class="space-y-6">
-                <div class="text-center">
-                    <p class="text-slate-400 uppercase tracking-widest text-sm">Ongoing</p>
-                    <p id="st2-ongoing" class="text-8xl font-black text-white">--</p>
-                </div>
-                <div class="grid grid-cols-3 gap-2 text-center">
-                    <div class="bg-slate-900/50 p-3 rounded-xl border border-slate-700">
-                        <p class="text-[10px] text-slate-500 uppercase">Next</p>
-                        <p id="st2-next" class="text-2xl font-bold text-indigo-300">--</p>
-                    </div>
-                    <div class="bg-slate-900/50 p-3 rounded-xl border border-slate-700">
-                        <p class="text-[10px] text-slate-500 uppercase">Wait</p>
-                        <p id="st2-waiting" class="text-2xl font-bold">--</p>
-                    </div>
-                    <div class="bg-slate-900/50 p-3 rounded-xl border border-slate-700">
-                        <p class="text-[10px] text-slate-500 uppercase">Ready</p>
-                        <p id="st2-ready" class="text-2xl font-bold">--</p>
-                    </div>
+                <div class="bg-slate-900/50 p-3 rounded-xl border border-slate-700">
+                    <p class="text-[10px] text-slate-500 uppercase">Ready</p>
+                    <p id="st1-ready" class="text-2xl font-bold">--</p>
                 </div>
             </div>
-<!--            <footer class="mt-6 pt-4 border-t border-slate-700">-->
-<!--                <p id="st2-remarks" class="text-lg text-slate-300 text-center italic">Ready</p>-->
-<!--            </footer>-->
-        </section>
+        </div>
+        <!--            <footer class="mt-6 pt-4 border-t border-slate-700">-->
+        <!--                <p id="st1-remarks" class="text-lg text-slate-300 text-center italic">Ready</p>-->
+        <!--            </footer>-->
+    </section>
 
-        <section class="bg-slate-800/50 border border-slate-700 rounded-3xl p-6 flex flex-col justify-between shadow-xl">
-            <div class="flex justify-between items-start border-b border-slate-700 pb-4 mb-4">
-                <h2 class="text-4xl font-bold text-amber-400">Station 03</h2>
-                <span id="st3-status" class="bg-green-500/20 text-green-400 px-3 py-1 rounded-full text-xs font-mono border border-green-500/30">Active</span>
+    <section class="bg-slate-800/50 border border-slate-700 rounded-3xl p-6 flex flex-col justify-between shadow-xl">
+        <div class="flex justify-between items-start border-b border-slate-700 pb-4 mb-4">
+            <h2 class="text-4xl font-bold text-amber-400">Station 02</h2>
+            <span id="st2-status"
+                  class="bg-green-500/20 text-green-400 px-3 py-1 rounded-full text-xs font-mono border border-green-500/30">Active</span>
+        </div>
+        <div class="space-y-6">
+            <div class="text-center">
+                <p class="text-slate-400 uppercase tracking-widest text-sm">Ongoing</p>
+                <p id="st2-ongoing" class="text-8xl font-black text-white">--</p>
             </div>
-            <div class="space-y-6">
-                <div class="text-center">
-                    <p class="text-slate-400 uppercase tracking-widest text-sm">Ongoing</p>
-                    <p id="st3-ongoing" class="text-8xl font-black text-white">--</p>
+            <div class="grid grid-cols-3 gap-2 text-center">
+                <div class="bg-slate-900/50 p-3 rounded-xl border border-slate-700">
+                    <p class="text-[10px] text-slate-500 uppercase">Next</p>
+                    <p id="st2-next" class="text-2xl font-bold text-indigo-300">--</p>
                 </div>
-                <div class="grid grid-cols-3 gap-2 text-center">
-                    <div class="bg-slate-900/50 p-3 rounded-xl border border-slate-700">
-                        <p class="text-[10px] text-slate-500 uppercase">Next</p>
-                        <p id="st3-next" class="text-2xl font-bold text-indigo-300">--</p>
-                    </div>
-                    <div class="bg-slate-900/50 p-3 rounded-xl border border-slate-700">
-                        <p class="text-[10px] text-slate-500 uppercase">Wait</p>
-                        <p id="st3-waiting" class="text-2xl font-bold">--</p>
-                    </div>
-                    <div class="bg-slate-900/50 p-3 rounded-xl border border-slate-700">
-                        <p class="text-[10px] text-slate-500 uppercase">Ready</p>
-                        <p id="st3-ready" class="text-2xl font-bold">--</p>
-                    </div>
+                <div class="bg-slate-900/50 p-3 rounded-xl border border-slate-700">
+                    <p class="text-[10px] text-slate-500 uppercase">Wait</p>
+                    <p id="st2-waiting" class="text-2xl font-bold">--</p>
+                </div>
+                <div class="bg-slate-900/50 p-3 rounded-xl border border-slate-700">
+                    <p class="text-[10px] text-slate-500 uppercase">Ready</p>
+                    <p id="st2-ready" class="text-2xl font-bold">--</p>
                 </div>
             </div>
-<!--            <footer class="mt-6 pt-4 border-t border-slate-700">-->
-<!--                <p id="st3-remarks" class="text-lg text-slate-300 text-center italic">Ready</p>-->
-<!--            </footer>-->
-        </section>
-    </main>
+        </div>
+        <!--            <footer class="mt-6 pt-4 border-t border-slate-700">-->
+        <!--                <p id="st2-remarks" class="text-lg text-slate-300 text-center italic">Ready</p>-->
+        <!--            </footer>-->
+    </section>
 
-    <footer class="p-4 bg-slate-950 text-slate-600 text-[10px] flex justify-between uppercase tracking-widest mt-auto">
-        <span>System: Online</span>
-        <span id="last-update">Last Updated: --:--:--</span>
-    </footer>
+    <section class="bg-slate-800/50 border border-slate-700 rounded-3xl p-6 flex flex-col justify-between shadow-xl">
+        <div class="flex justify-between items-start border-b border-slate-700 pb-4 mb-4">
+            <h2 class="text-4xl font-bold text-amber-400">Station 03</h2>
+            <span id="st3-status"
+                  class="bg-green-500/20 text-green-400 px-3 py-1 rounded-full text-xs font-mono border border-green-500/30">Active</span>
+        </div>
+        <div class="space-y-6">
+            <div class="text-center">
+                <p class="text-slate-400 uppercase tracking-widest text-sm">Ongoing</p>
+                <p id="st3-ongoing" class="text-8xl font-black text-white">--</p>
+            </div>
+            <div class="grid grid-cols-3 gap-2 text-center">
+                <div class="bg-slate-900/50 p-3 rounded-xl border border-slate-700">
+                    <p class="text-[10px] text-slate-500 uppercase">Next</p>
+                    <p id="st3-next" class="text-2xl font-bold text-indigo-300">--</p>
+                </div>
+                <div class="bg-slate-900/50 p-3 rounded-xl border border-slate-700">
+                    <p class="text-[10px] text-slate-500 uppercase">Wait</p>
+                    <p id="st3-waiting" class="text-2xl font-bold">--</p>
+                </div>
+                <div class="bg-slate-900/50 p-3 rounded-xl border border-slate-700">
+                    <p class="text-[10px] text-slate-500 uppercase">Ready</p>
+                    <p id="st3-ready" class="text-2xl font-bold">--</p>
+                </div>
+            </div>
+        </div>
+        <!--            <footer class="mt-6 pt-4 border-t border-slate-700">-->
+        <!--                <p id="st3-remarks" class="text-lg text-slate-300 text-center italic">Ready</p>-->
+        <!--            </footer>-->
+    </section>
+</main>
 
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
-    <script>
-         const firebaseConfig = {
-            apiKey: "AIzaSyAeodb0vREvOcd-683q-E7OWVfRFyvVK7s",
-            authDomain: "vivavocemanager.firebaseapp.com",
-            databaseURL: "https://vivavocemanager-default-rtdb.asia-southeast1.firebasedatabase.app",
-            projectId: "vivavocemanager",
-            storageBucket: "vivavocemanager.firebasestorage.app",
-            messagingSenderId: "609230399343",
-            appId: "1:609230399343:web:1525d72e5ab418cfb6ea9a"
-          };
-         if (!firebase.apps.length) {
-              firebase.initializeApp(firebaseConfig);
-         }
-         const db = firebase.database();
+<footer class="p-4 bg-slate-950 text-slate-600 text-[10px] flex justify-between uppercase tracking-widest mt-auto">
+    <span>System: Online</span>
+    <span id="last-update">Last Updated: --:--:--</span>
+</footer>
 
- // 1. Local Clock Logic
-        setInterval(() => {
-            document.getElementById('local-clock').innerText = new Date().toLocaleTimeString();
-        }, 1000);
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+<script>
+    const firebaseConfig = {
+       apiKey: "AIzaSyAeodb0vREvOcd-683q-E7OWVfRFyvVK7s",
+       authDomain: "vivavocemanager.firebaseapp.com",
+       databaseURL: "https://vivavocemanager-default-rtdb.asia-southeast1.firebasedatabase.app",
+       projectId: "vivavocemanager",
+       storageBucket: "vivavocemanager.firebasestorage.app",
+       messagingSenderId: "609230399343",
+       appId: "1:609230399343:web:1525d72e5ab418cfb6ea9a"
+     };
+    if (!firebase.apps.length) {firebase.initializeApp(firebaseConfig);}
+    const db = firebase.database();
 
-        // 2. Synchronized Timer Logic
-        let timerStartTime = 0;
-        let timerStatus = 'stopped';
-        let timerData = null;
+// 1. Local Clock Logic
+   setInterval(() => {
+       document.getElementById('local-clock').innerText = new Date().toLocaleTimeString();
+   }, 1000);
 
-        const bellSound = document.getElementById('bell-sound');
-        //Adding Bell audio
-        let bellPlayed = false; // Prevents the bell from ringing multiple times in the same second
+   let timerStartTime = 0;
+   let timerStatus = 'stopped';
+   let timerData = null;
+   let bellPlayed = false;
+   const bellSound = document.getElementById('bell-sound');
 
-        function enableAudio() {
-            const bell = document.getElementById('bell-sound');
-            // Attempt to unlock audio
-            bell.play().then(() => {
-                bell.pause();
-                bell.currentTime = 0;
-            }).catch(e => console.log("Audio unlock attempted"));
-            document.getElementById('sound-overlay').style.display = 'none';
-        }
-         db.ref('timer').on('value', (snapshot) => {
-    timerData = snapshot.val();
-    if (timerData && timerData.status === 'running') {
-        timerStartTime = timerData.startTime;
-        timerStatus = 'running';
-    } else {
-        timerStartTime = 0;
-        timerStatus = 'stopped';
-        document.getElementById('session-timer').innerText = "01:00";
-    }
-});
+   function enableAudio() {
+       bellSound.play().then(() => {
+           bellSound.pause();
+           bellSound.currentTime = 0;
+       }).catch(e => console.log("Audio unlock attempted"));
+       document.getElementById('sound-overlay').style.display = 'none';
+   }
 
-        setInterval(() => {
-    if (timerStatus !== 'running' || timerStartTime === 0) return;
+    db.ref('timer').on('value', (snapshot) => {
+       timerData = snapshot.val();
+       if (timerData && timerData.status === 'running') {
+           timerStartTime = timerData.startTime;
+           timerStatus = 'running';
+       } else {
+           timerStartTime = 0;
+           timerStatus = 'stopped';
+           document.getElementById('session-timer').innerText = "01:00";
+       }
+   });
 
-    const now = Date.now();
-    const elapsedMs = now - timerStartTime;
-    const fourMinMs = 1 * 60 * 1000;
+   setInterval(() => {
+        if (timerStatus !== 'running' || timerStartTime === 0) return;
 
-    // 1. Calculate Rounds (0, 1, 2, 3...)
-    const currentRound = Math.floor(elapsedMs / fourMinMs);
+        const now = Date.now();
+        const elapsedMs = now - timerStartTime;
+        const fourMinMs = 1 * 60 * 1000;
+        const currentRound = Math.floor(elapsedMs / fourMinMs);
 
-    // 2. Automation: Update all 3 stations based on the round
-    [1, 2, 3].forEach(id => {
-        const baseRoll = timerData[`st${id}_base`] || 1;
-        let maxRoll;
-        if (id === 1) {
-            // Station 1 ends where Station 2 begins
-            maxRoll = parseInt(timerData.st2_base) ? parseInt(timerData.st2_base) - 1 : baseRoll + 11;
-        } else if (id === 2) {
-            // Station 2 ends where Station 3 begins
-            maxRoll = parseInt(timerData.st3_base) ? parseInt(timerData.st3_base) - 1 : baseRoll + 11;
-        } else {
-            // Station 3 is the last, so we use a fixed range (e.g., +11)
-            maxRoll = baseRoll + 11;
-        }
+        if (timerData && currentRound > 0 && timerData.showSetup !== false) {
+                db.ref('timer/showSetup').set(false);
+            }
 
-        const ongoing = baseRoll + currentRound;
-        const next = ongoing + 1;
-        const wait = ongoing + 2;
-        const ready = ongoing + 3;
+// 2. Automation: Update all 3 stations based on the round
+        [1, 2, 3].forEach(id => {
+           if(!timerData) return;
+           const baseRoll = timerData[`st${id}_base`] || 1;
+           let maxRoll;
+           if (id === 1) {maxRoll = parseInt(timerData.st2_base) ? parseInt(timerData.st2_base) - 1 : baseRoll + 11;}
+           else if (id === 2) {maxRoll = parseInt(timerData.st3_base) ? parseInt(timerData.st3_base) - 1 : baseRoll + 11;}
+           else {maxRoll = baseRoll + 11;}
 
-        // Helper to check if we passed the 12-student limit
-        // Replace your old checkLimit with this:
-        const checkLimit = (num) => {
-            const n = parseInt(num);
-            const m = parseInt(maxRoll);
-            return (n > m) ? "--" : n;
-        };
+           const ongoing = baseRoll + currentRound;
+           const next = ongoing + 1;
+           const wait = ongoing + 2;
+           const ready = ongoing + 3;
 
-        document.getElementById(`st${id}-ongoing`).innerText = checkLimit(ongoing);
-        document.getElementById(`st${id}-next`).innerText = checkLimit(next);
-        document.getElementById(`st${id}-waiting`).innerText = checkLimit(wait);
-        document.getElementById(`st${id}-ready`).innerText = checkLimit(ready);
+           const checkLimit = (num) => {
+               const n = parseInt(num);
+               const m = parseInt(maxRoll);
+               return (n > m) ? "--" : n;
+           };
 
-        const statusEl = document.getElementById(`st${id}-status`);
-        const remarkEl = document.getElementById(`st${id}-remarks`);
+           document.getElementById(`st${id}-ongoing`).innerText = checkLimit(ongoing);
+           document.getElementById(`st${id}-next`).innerText = checkLimit(next);
+           document.getElementById(`st${id}-waiting`).innerText = checkLimit(wait);
+           document.getElementById(`st${id}-ready`).innerText = checkLimit(ready);
 
-        if (ongoing > maxRoll) {
-            statusEl.innerText = "Closed";
-            statusEl.className = "bg-red-500/20 text-red-400 px-3 py-1 rounded-full text-xs font-mono border border-red-500/30";
-        } else {
-            statusEl.innerText = "Active";
-            statusEl.className = "bg-green-500/20 text-green-400 px-3 py-1 rounded-full text-xs font-mono border border-green-500/30";
-        }
-        });
+           const statusEl = document.getElementById(`st${id}-status`);
+           const remarkEl = document.getElementById(`st${id}-remarks`);
+           if (remarkEl) {
+                remarkEl.innerText = data.remarks || "";
+            }
+           document.getElementById('last-update').innerText = "Last Updated: " + new Date().toLocaleTimeString();
+           if (ongoing > maxRoll) {
+               statusEl.innerText = "Closed";
+               statusEl.className = "bg-red-500/20 text-red-400 px-3 py-1 rounded-full text-xs font-mono border border-red-500/30";
+           } else {
+               statusEl.innerText = "Active";
+               statusEl.className = "bg-green-500/20 text-green-400 px-3 py-1 rounded-full text-xs font-mono border border-green-500/30";
+           }
+           });
 
-    // 3. Normal Timer Display
-    const remainingMs = fourMinMs - (elapsedMs % fourMinMs);
-    const m = Math.floor(remainingMs / 60000);
-    const s = Math.floor((remainingMs % 60000) / 1000);
-    document.getElementById('session-timer').innerText = `${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;
+// 3. Normal Timer Display
+const remainingMs = fourMinMs - (elapsedMs % fourMinMs);
+const m = Math.floor(remainingMs / 60000);
+const s = Math.floor((remainingMs % 60000) / 1000);
+document.getElementById('session-timer').innerText = `${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;
 
-    // 4. Bell Logic (Keep your existing bell code here)
-    if (m === 0 && s === 0 && !bellPlayed) {
-        bellSound.play();
-        bellPlayed = true;
-    }
-    if (s > 0) bellPlayed = false;
+// 4. Bell Logic (Keep your existing bell code here)
+if (m === 0 && s === 0 && !bellPlayed) {
+   bellSound.play();
+   bellPlayed = true;
+}
+if (s > 0) bellPlayed = false;
 
 }, 1000);
-        db.ref('timer/triggerBell').on('value', (snap) => {
-            if(snap.val()) bellSound.play();
-        });
-  // 3. Listen for Global Updates
-  db.ref('global').on('value', (snapshot) => {
-    const data = snapshot.val();
-    if (data) {
-      document.getElementById('announcement').innerText = data.announcement || "Viva-Voce Session Active";
-      document.getElementById('global-comments').innerText = data.comments || "";
-    }
-  });
+   db.ref('timer/triggerBell').on('value', (snap) => {
+       if(snap.val()) bellSound.play();
+   });
+// 3. Listen for Global Updates
+db.ref('global').on('value', (snapshot) => {
+const data = snapshot.val();
+if (data) {
+ document.getElementById('announcement').innerText = data.announcement || "Viva-Voce Session Active";
+ document.getElementById('global-comments').innerText = data.comments || "";
+}
+});
 
-  // 4. Listen for Station Updates (1, 2, and 3)
-  [1, 2, 3].forEach(id => {
-    db.ref('stations/st' + id).on('value', (snapshot) => {
-      const data = snapshot.val();
-      if (data) {
-        document.getElementById(`st${id}-ongoing`).innerText = data.ongoing || "--";
-        document.getElementById(`st${id}-next`).innerText = data.next || "--";
-        document.getElementById(`st${id}-waiting`).innerText = data.waiting || "--";
-        document.getElementById(`st${id}-ready`).innerText = data.ready || "--";
-        document.getElementById(`st${id}-remarks`).innerText = data.remarks || "";
-        // Update the "Last Updated" timestamp in the footer
-        document.getElementById('last-update').innerText = "Last Updated: " + new Date().toLocaleTimeString();
-      }
-    });
-  });
+// 4. Listen for Station Updates (1, 2, and 3)
+[1, 2, 3].forEach(id => {
+db.ref('stations/st' + id).on('value', (snapshot) => {
+ const data = snapshot.val();
+ if (data) {
+   document.getElementById(`st${id}-ongoing`).innerText = data.ongoing || "--";
+   document.getElementById(`st${id}-next`).innerText = data.next || "--";
+   document.getElementById(`st${id}-waiting`).innerText = data.waiting || "--";
+   document.getElementById(`st${id}-ready`).innerText = data.ready || "--";
+   document.getElementById(`st${id}-remarks`).innerText = data.remarks || "";
+   // Update the "Last Updated" timestamp in the footer
+   document.getElementById('last-update').innerText = "Last Updated: " + new Date().toLocaleTimeString();
+ }
+});
+});
+   // --- Precise Setup Display Logic ---
+const setupInfo = document.getElementById('setup-info');
+const displayQr = document.getElementById('display-qr');
+const displayTokenVal = document.getElementById('display-token-val');
+
+// Listen for the specific "Show Setup" signal from the Admin
+db.ref('timer/showSetup').on('value', (snap) => {
+   const showSetup = snap.val() !== false; // Default to true if null/empty
+
+   if (showSetup) {
+       // If we should show it, fetch the token to generate the QR
+       db.ref('admin_session').once('value', (tokenSnap) => {
+           const token = tokenSnap.val();
+           if (token && setupInfo) {
+               setupInfo.style.display = 'flex';
+               displayTokenVal.innerText = token;
+               displayQr.src = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${token}`;
+           }
+       }); } else {
+       // Hide immediately if Admin has gained access or started the session
+       if (setupInfo) setupInfo.style.display = 'none';
+   }
+});
 </script>
 </body>
 </html>
