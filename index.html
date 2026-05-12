@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Viva Admin">
@@ -167,6 +168,7 @@
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 <script>
+    // 1. INITIALIZE FIREBASE
     const firebaseConfig = {
        apiKey: "AIzaSyAeodb0vREvOcd-683q-E7OWVfRFyvVK7s",
        authDomain: "vivavocemanager.firebaseapp.com",
@@ -176,29 +178,36 @@
        messagingSenderId: "609230399343",
        appId: "1:609230399343:web:1525d72e5ab418cfb6ea9a"
      };
-    if (!firebase.apps.length) {firebase.initializeApp(firebaseConfig);}
+    if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
     const db = firebase.database();
 
-// 1. Local Clock Logic
-   setInterval(() => {
+    // 2. CAPTURE EVENT CONTEXT
+    const eventID = new URLSearchParams(window.location.search).get('event') || 'default_session';
+    const eventRoot = `events/${eventID}`;
+
+    // 3. UI ELEMENTS
+    const setupInfo = document.getElementById('setup-info');
+    const displayQr = document.getElementById('display-qr');
+    const displayTokenVal = document.getElementById('display-token-val');
+    const bellSound = document.getElementById('bell-sound');
+
+    let timerStartTime = 0;
+    let timerStatus = 'stopped';
+    let timerData = null;
+    let bellPlayed = false;
+
+    // 4. LOCAL CLOCK
+    setInterval(() => {
        document.getElementById('local-clock').innerText = new Date().toLocaleTimeString();
-   }, 1000);
+    }, 1000);
 
-   let timerStartTime = 0;
-   let timerStatus = 'stopped';
-   let timerData = null;
-   let bellPlayed = false;
-   const bellSound = document.getElementById('bell-sound');
-
-   function enableAudio() {
-       bellSound.play().then(() => {
-           bellSound.pause();
-           bellSound.currentTime = 0;
-       }).catch(e => console.log("Audio unlock attempted"));
+    function enableAudio() {
+       bellSound.play().then(() => { bellSound.pause(); bellSound.currentTime = 0; });
        document.getElementById('sound-overlay').style.display = 'none';
-   }
+    }
 
-    db.ref('timer').on('value', (snapshot) => {
+    // 5. TIMER & DATA LISTENERS
+    db.ref(`${eventRoot}/timer`).on('value', (snapshot) => {
        timerData = snapshot.val();
        if (timerData && timerData.status === 'running') {
            timerStartTime = timerData.startTime;
@@ -208,124 +217,74 @@
            timerStatus = 'stopped';
            document.getElementById('session-timer').innerText = "01:00";
        }
-   });
+    });
 
-   setInterval(() => {
-        if (timerStatus !== 'running' || timerStartTime === 0) return;
+    // 6. AUTOMATION LOOP
+    setInterval(() => {
+        if (timerStatus !== 'running' || !timerData) return;
 
         const now = Date.now();
         const elapsedMs = now - timerStartTime;
         const fourMinMs = 1 * 60 * 1000;
         const currentRound = Math.floor(elapsedMs / fourMinMs);
 
-        if (timerData && currentRound > 0 && timerData.showSetup !== false) {
-                db.ref('timer/showSetup').set(false);
-            }
+        if (currentRound > 0 && timerData.showSetup !== false) {
+            db.ref(`${eventRoot}/timer/showSetup`).set(false);
+        }
 
-// 2. Automation: Update all 3 stations based on the round
         [1, 2, 3].forEach(id => {
-           if(!timerData) return;
            const baseRoll = timerData[`st${id}_base`] || 1;
-           let maxRoll;
-           if (id === 1) {maxRoll = parseInt(timerData.st2_base) ? parseInt(timerData.st2_base) - 1 : baseRoll + 11;}
-           else if (id === 2) {maxRoll = parseInt(timerData.st3_base) ? parseInt(timerData.st3_base) - 1 : baseRoll + 11;}
-           else {maxRoll = baseRoll + 11;}
+           let maxRoll = baseRoll + 11;
+           if (id === 1 && timerData.st2_base) maxRoll = parseInt(timerData.st2_base) - 1;
+           if (id === 2 && timerData.st3_base) maxRoll = parseInt(timerData.st3_base) - 1;
 
            const ongoing = baseRoll + currentRound;
-           const next = ongoing + 1;
-           const wait = ongoing + 2;
-           const ready = ongoing + 3;
-
-           const checkLimit = (num) => {
-               const n = parseInt(num);
-               const m = parseInt(maxRoll);
-               return (n > m) ? "--" : n;
-           };
+           const checkLimit = (num) => (num > maxRoll) ? "--" : num;
 
            document.getElementById(`st${id}-ongoing`).innerText = checkLimit(ongoing);
-           document.getElementById(`st${id}-next`).innerText = checkLimit(next);
-           document.getElementById(`st${id}-waiting`).innerText = checkLimit(wait);
-           document.getElementById(`st${id}-ready`).innerText = checkLimit(ready);
+           document.getElementById(`st${id}-next`).innerText = checkLimit(ongoing + 1);
+           document.getElementById(`st${id}-waiting`).innerText = checkLimit(ongoing + 2);
+           document.getElementById(`st${id}-ready`).innerText = checkLimit(ongoing + 3);
+        });
 
-           const statusEl = document.getElementById(`st${id}-status`);
-           const remarkEl = document.getElementById(`st${id}-remarks`);
-           if (remarkEl) {
-                remarkEl.innerText = data.remarks || "";
-            }
-           document.getElementById('last-update').innerText = "Last Updated: " + new Date().toLocaleTimeString();
-           if (ongoing > maxRoll) {
-               statusEl.innerText = "Closed";
-               statusEl.className = "bg-red-500/20 text-red-400 px-3 py-1 rounded-full text-xs font-mono border border-red-500/30";
-           } else {
-               statusEl.innerText = "Active";
-               statusEl.className = "bg-green-500/20 text-green-400 px-3 py-1 rounded-full text-xs font-mono border border-green-500/30";
-           }
+        const remainingMs = fourMinMs - (elapsedMs % fourMinMs);
+        const m = Math.floor(remainingMs / 60000);
+        const s = Math.floor((remainingMs % 60000) / 1000);
+        document.getElementById('session-timer').innerText = `${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;
+
+        if (m === 0 && s === 0 && !bellPlayed) { bellSound.play(); bellPlayed = true; }
+        if (s > 0) bellPlayed = false;
+    }, 1000);
+
+    // 7. ACCESS CODE LOGIC (Fixed to generate QR Image)
+    db.ref(`${eventRoot}/timer/showSetup`).on('value', (snap) => {
+       const showSetup = snap.val() !== false;
+
+       if (showSetup) {
+           setupInfo.style.display = 'flex';
+
+           db.ref(`${eventRoot}/admin_session`).on('value', (tokenSnap) => {
+               const token = tokenSnap.val();
+               if (token) {
+                   displayTokenVal.innerText = token;
+                   // FIX: We must assign the 'src' so the browser can download the QR image
+                   if (displayQr) {
+                       displayQr.src = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${token}`;
+                       displayQr.style.display = 'block';
+                   }
+               } else {
+                   displayTokenVal.innerText = "INITIALIZING...";
+                   if (displayQr) displayQr.style.display = 'none'; // Hide broken icon while waiting
+               }
            });
+       } else {
+           setupInfo.style.display = 'none';
+       }
+    });
 
-// 3. Normal Timer Display
-const remainingMs = fourMinMs - (elapsedMs % fourMinMs);
-const m = Math.floor(remainingMs / 60000);
-const s = Math.floor((remainingMs % 60000) / 1000);
-document.getElementById('session-timer').innerText = `${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;
-
-// 4. Bell Logic (Keep your existing bell code here)
-if (m === 0 && s === 0 && !bellPlayed) {
-   bellSound.play();
-   bellPlayed = true;
-}
-if (s > 0) bellPlayed = false;
-
-}, 1000);
-   db.ref('timer/triggerBell').on('value', (snap) => {
-       if(snap.val()) bellSound.play();
-   });
-// 3. Listen for Global Updates
-db.ref('global').on('value', (snapshot) => {
-const data = snapshot.val();
-if (data) {
- document.getElementById('announcement').innerText = data.announcement || "Viva-Voce Session Active";
- document.getElementById('global-comments').innerText = data.comments || "";
-}
-});
-
-// 4. Listen for Station Updates (1, 2, and 3)
-[1, 2, 3].forEach(id => {
-db.ref('stations/st' + id).on('value', (snapshot) => {
- const data = snapshot.val();
- if (data) {
-   document.getElementById(`st${id}-ongoing`).innerText = data.ongoing || "--";
-   document.getElementById(`st${id}-next`).innerText = data.next || "--";
-   document.getElementById(`st${id}-waiting`).innerText = data.waiting || "--";
-   document.getElementById(`st${id}-ready`).innerText = data.ready || "--";
-   document.getElementById(`st${id}-remarks`).innerText = data.remarks || "";
-   // Update the "Last Updated" timestamp in the footer
-   document.getElementById('last-update').innerText = "Last Updated: " + new Date().toLocaleTimeString();
- }
-});
-});
-   // --- Precise Setup Display Logic ---
-const setupInfo = document.getElementById('setup-info');
-const displayQr = document.getElementById('display-qr');
-const displayTokenVal = document.getElementById('display-token-val');
-
-// Listen for the specific "Show Setup" signal from the Admin
-db.ref('timer/showSetup').on('value', (snap) => {
-   const showSetup = snap.val() !== false; // Default to true if null/empty
-
-   if (showSetup) {
-       // If we should show it, fetch the token to generate the QR
-       db.ref('admin_session').once('value', (tokenSnap) => {
-           const token = tokenSnap.val();
-           if (token && setupInfo) {
-               setupInfo.style.display = 'flex';
-               displayTokenVal.innerText = token;
-               displayQr.src = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${token}`;
-           }
-       }); } else {
-       // Hide immediately if Admin has gained access or started the session
-       if (setupInfo) setupInfo.style.display = 'none';
-   }
-});
+    db.ref(`${eventRoot}/timer/triggerBell`).on('value', (snap) => {
+       if(snap.val()) bellSound.play().catch(e => console.log("Audio waiting"));
+    });
 </script>
 </body>
 </html>

@@ -2,8 +2,9 @@
 <html lang="en" xmlns="http://www.w3.org/1999/html">
 <head>
     <meta charset="UTF-8">
+    <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">x
     <meta name="apple-mobile-web-app-title" content="Viva Admin">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <style>
@@ -34,6 +35,10 @@
             <button onclick="verifyManualCode()"
                     class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-3 rounded-xl transition-all active:scale-95">
                 Join Session
+            </button>
+            <button onclick="resetStation()"
+                    class="w-full bg-red-900/40 hover:bg-red-600 text-red-200 font-bold py-3 rounded-xl border border-red-500/30 transition-all active:scale-95 mt-4">
+                Emergency Master Reset
             </button>
         </div>
         <div id="qr-section" class="hidden mt-4">
@@ -179,9 +184,10 @@
 
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
-</body>
+<!-- Add this new line for Authentication -->
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
 <script>
-    // 1. INITIALIZE FIREBASE FIRST (Crucial: This must be at the top)
+    // 1. INITIALIZE FIREBASE
     const firebaseConfig = {
         apiKey: "AIzaSyAeodb0vREvOcd-683q-E7OWVfRFyvVK7s",
         authDomain: "vivavocemanager.firebaseapp.com",
@@ -196,143 +202,119 @@
         firebase.initializeApp(firebaseConfig);
     }
     const db = firebase.database();
+    const auth = firebase.auth();
 
-    // 2. DEFINE SECURITY VARIABLES
+    const eventID = new URLSearchParams(window.location.search).get('event') || 'default_session';
+    const eventRoot = `events/${eventID}`;
+
     const lockOverlay = document.getElementById('admin-lock-overlay');
-    const statusText = document.getElementById('lock-status');
     const qrImg = document.getElementById('access-qr');
     const tokenDisplay = document.getElementById('display-token');
     const qrSection = document.getElementById('qr-section');
 
-    // 3. SECURITY LOGIC FUNCTIONS
-    let localToken = localStorage.getItem('viva_access_token');
-
+    // 4. AUTH & ACCESS LOGIC
     function checkSessionAccess() {
-        const adminRef = db.ref('admin_session');
-
-        adminRef.on('value', (snapshot) => {
+        db.ref(`${eventRoot}/admin_session`).on('value', (snapshot) => {
             const serverToken = snapshot.val();
+            const localToken = localStorage.getItem(`viva_token_${eventID}`);
 
             if (!serverToken) {
-                // No one has claimed it, current user claims it automatically
                 const newToken = Math.floor(100000 + Math.random() * 900000).toString();
-                adminRef.set(newToken);
-                localStorage.setItem('viva_access_token', newToken);
-                localToken = newToken;
+                db.ref(`${eventRoot}/admin_session`).set(newToken);
+                localStorage.setItem(`viva_token_${eventID}`, newToken);
+                db.ref(`${eventRoot}/timer/showSetup`).set(true);
                 unlockAdmin();
-            }
-            else if (serverToken === localToken) {
-                // Authorized
+                showAccessQR(newToken);
+            } else if (serverToken === localToken) {
                 unlockAdmin();
                 showAccessQR(serverToken);
-            }
-            else {
-                // Not Authorized - Show the lock
-                lockAdmin();
+                db.ref(`${eventRoot}/timer/showSetup`).set(true);
+            } else {
+                lockOverlay.style.display = 'flex';
             }
         });
     }
 
     function verifyManualCode() {
         const enteredCode = document.getElementById('inp-access-code').value.trim();
-        if (enteredCode.length !== 6) {
-            alert("Please enter a valid 6-digit code.");
-            return;
-        }
-
-        db.ref('admin_session').once('value', (snapshot) => {
-            const serverToken = snapshot.val();
-            if (enteredCode === serverToken) {
-                localStorage.setItem('viva_access_token', enteredCode);
-                alert("Access Granted! Syncing...");
+        db.ref(`${eventRoot}/admin_session`).once('value', (snapshot) => {
+            if (enteredCode === snapshot.val()) {
+                localStorage.setItem(`viva_token_${eventID}`, enteredCode);
+                alert("Access Granted!");
                 location.reload();
             } else {
-                alert("Invalid Code. Check the projector screen.");
-                document.getElementById('inp-access-code').value = "";
+                alert("Invalid Code. Access Denied.");
             }
         });
     }
 
-    function unlockAdmin() {
-        lockOverlay.style.display = 'none';
-        db.ref('timer/showSetup').set(false);
-    }
-
-    function lockAdmin() { lockOverlay.style.display = 'flex'; }
+    function unlockAdmin() { lockOverlay.style.display = 'none'; }
 
     function showAccessQR(token) {
-        const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${token}`;
-        qrImg.src = qrUrl;
-        tokenDisplay.innerText = "CODE: " + token;
-        qrSection.classList.remove('hidden');
+        if(qrImg && tokenDisplay && qrSection) {
+            qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${token}`;
+            tokenDisplay.innerText = "EVENT: " + eventID + " | CODE: " + token;
+            qrSection.classList.remove('hidden');
+        }
     }
 
-    // Start Security Check
-    checkSessionAccess();
-
-    // 4. ADMIN CONTROL FUNCTIONS
+    // 5. EVENT CONTROLS
     function startTimer() {
-        db.ref('timer').set({
+        db.ref(`${eventRoot}/timer`).set({
             startTime: Date.now(),
             status: 'running',
-            st1_base: parseInt(document.getElementById('st1-start-roll').value) || 1,
-            st2_base: parseInt(document.getElementById('st2-start-roll').value) || 13,
-            st3_base: parseInt(document.getElementById('st3-start-roll').value) || 25,
+            st1_base: parseInt(document.getElementById('st1-start-roll')?.value) || 1,
+            st2_base: parseInt(document.getElementById('st2-start-roll')?.value) || 13,
+            st3_base: parseInt(document.getElementById('st3-start-roll')?.value) || 25,
             showSetup: false
         }).then(() => {
-            document.getElementById('timer-status').innerText = "Timer Running";
+            const statusEl = document.getElementById('timer-status');
+            if(statusEl) statusEl.innerText = "Timer Running";
         });
     }
 
     function stopTimer() {
-        db.ref('timer').update({ startTime: 0, status: 'stopped' })
-        .then(() => { document.getElementById('timer-status').innerText = "Timer Stopped"; });
+        db.ref(`${eventRoot}/timer`).update({ startTime: 0, status: 'stopped' });
     }
 
     function updateGlobal() {
-        db.ref('global').set({
-            announcement: document.getElementById('inp-announcement').value,
-            comments: document.getElementById('inp-global-comments').value
+        db.ref(`${eventRoot}/global`).set({
+            announcement: document.getElementById('inp-announcement')?.value || "",
+            comments: document.getElementById('inp-global-comments')?.value || ""
         });
     }
 
     function updateStation(id) {
-        db.ref('stations/st' + id).set({
-            ongoing: document.getElementById(`st${id}-inp-ongoing`).value || "--",
-            next: document.getElementById(`st${id}-inp-next`).value || "--",
-            waiting: document.getElementById(`st${id}-inp-waiting`).value || "--",
-            remarks: document.getElementById(`st${id}-inp-remarks`) ? document.getElementById(`st${id}-inp-remarks`).value : "Ready"
-        }).then(() => alert("Station " + id + " Updated!"));
+        db.ref(`${eventRoot}/stations/st${id}`).set({
+            ongoing: document.getElementById(`st${id}-inp-ongoing`)?.value || "--",
+            next: document.getElementById(`st${id}-inp-next`)?.value || "--",
+            waiting: document.getElementById(`st${id}-inp-waiting`)?.value || "--",
+            remarks: document.getElementById(`st${id}-inp-remarks`)?.value || "Ready"
+        });
+    }
+
+    // FIXED: Syntax error removed, properly updates two database nodes at once
+    function testBell() {
+        db.ref(`${eventRoot}/timer`).update({
+            triggerBell: Date.now(),
+            showSetup: false
+        });
     }
 
     function resetStation() {
-        if (confirm("MASTER RESET: Clear all Station data, Timer, and Admin Lock?")) {
-            db.ref('admin_session').remove();
-            localStorage.removeItem('viva_access_token');
-
-            db.ref('timer/showSetup').set(true);
-
-            db.ref('timer').set({
-                startTime: 0,
-                status: 'stopped',
-                showSetup: true
-            });
-
-            const resetData = { ongoing: "--", next: "--", waiting: "--", remarks: "Ready" };
-            [1, 2, 3].forEach(id => {
-                db.ref('stations/st' + id).set(resetData);
-                document.getElementById(`st${id}-inp-ongoing`).value = "";
-                document.getElementById(`st${id}-inp-next`).value = "";
-                document.getElementById(`st${id}-inp-waiting`).value = "";
-            });
-
-            alert("System Fully Reset!");
+        if (confirm(`MASTER RESET for ${eventID}? This clears all data and forces the code to show.`)) {
+            db.ref(eventRoot).remove();
+            db.ref(`${eventRoot}/timer`).set({ startTime: 0, status: 'stopped', showSetup: true });
+            localStorage.removeItem(`viva_token_${eventID}`);
             location.reload();
         }
     }
 
-    function testBell() {
-        db.ref('timer/triggerBell').set(Date.now());
-    }
+    // 6. AUTHENTICATION
+    auth.onAuthStateChanged((user) => {
+        if (user) checkSessionAccess();
+        else auth.signInAnonymously();
+    });
 </script>
+</body>
 </html>
